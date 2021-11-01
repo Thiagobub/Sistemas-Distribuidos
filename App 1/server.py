@@ -1,6 +1,7 @@
 from __future__ import print_function
 from base64 import b64decode,b64encode
 from datetime import datetime
+import threading
 
 from Crypto.Hash import SHA384
 from Crypto.Signature import pkcs1_15
@@ -27,6 +28,8 @@ class Publisher():
         self.users = {} # User -> [remote_ref, public key]
         self.enquetes = {} # Enquete -> [user1, user2, ...]
         self.flag_enquete = False
+
+        self.check()
 
     def getEnquetes(self):
         return [x.titulo for x in self.enquetes.keys()]
@@ -120,22 +123,26 @@ class Publisher():
             print(f"{name} consultando enquete que não existe")
             return "Permissão negada!"
 
+    def check(self):
+        threading.Thread(target=self._check).start()
 
-    def start(self):
+    def _check(self):
 
         # Fica checando as enquetes que existem, se o tempo
         #  delas acabou ou se todos os usuários ja votaram
+        print("Thread iniciada...")
         while(1):
-            for enquete in self.enquetes:
-                if len(enquete.votos) > 2:
-                    print("enquete teve 2 votos!!!")
-            pass
+            if len(self.enquetes) > 0:
+                for enquete in self.enquetes:
+                    if len(enquete.votos) == len(self.users.keys()):
+                        print("{enquete.titulo} fechou os votos!")
 
 
 Pyro4.Daemon.serveSimple({ Publisher: "example.publisher" }, ns = True) # ???
 # ns = True diz pro pyro usar um servidor de nome pra registrar as classes
 ns = Pyro4.locateNS()
 uri = Daemon.register()
+
 # uri = ...
 # ....
 # ns.register("example.warehouse", uri) # para registrar o servidor de nome
