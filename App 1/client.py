@@ -1,7 +1,14 @@
+######################################
+# Universidade Tecnológica Federal do Paraná
+# Sistemas Distribuídos
+# Alunos: Juliana Rodrigues e Thiago Bubniak
+# Engenharia de Computação
+# Aplicação 1 - Middleware com Pyro
+########################################
+
 from __future__ import print_function
 import sys
 import threading
-import datetime
 
 import Pyro4
 import Pyro4.util
@@ -12,9 +19,15 @@ from Crypto import Random
 from Crypto.Signature import pkcs1_15
 
 sys.excepthook = Pyro4.util.excepthook # faz aparecer as msg de erro do servidor
-# código e linhas tmb do código do servidor
+
 class Subscriber():
+    '''
+    Classe responsável pela comunicação dos usuários com o server (publisher + subscriber)
+    '''
     def __init__(self):
+        '''
+        Coleta o nome do usuário e gera as chaves pública e privada para cada um deles
+        '''
         self.server = Pyro4.core.Proxy("PYRONAME:example.publisher")
         self.name = input("Informe seu nome: ")
         self.abort = 0
@@ -27,8 +40,10 @@ class Subscriber():
         self.signature = pkcs1_15.new(self.private_key)
 
     def start(self):
+        '''
+        Conecta o usuário ao servidor (visit) informando que há um novo usuário no sistema
+        '''
         print(f"Entering the system.")
-
         # passar o nome, chave pública e referencia
         self.server.visit(self.name, self.public_key.exportKey(), self)
         self.menu()
@@ -37,6 +52,9 @@ class Subscriber():
         print(f'Enquetes ativas: {self.enquetes}')
 
     def menu(self):
+        '''
+        Método responsável por mostrar ao usuário quais são as opções de interação com o sistema
+        '''
         while(1):
             print('''1 - Cadastrar enquete\n2 - Cadastrar voto em enquete\n3 - Consultar enquete\n
             ''')
@@ -61,12 +79,16 @@ class Subscriber():
 
     @Pyro4.expose
     def notify(self, msg):
+        '''
+        Método que informa ao usuário o status das enquetes na qual ele está cadastrado
+        '''
         if 'Enquete nova' in msg:
             print(msg)
         elif 'Enquete encerrada' in msg:
             print(msg)
 
-# Sem isso não tava dando pra passar a classe
+# Daemon threads são responsáveis por rodar um bloco de código no background e não travar a execução
+# do código principal. 
 class DaemonThread(threading.Thread):
     def __init__(self, subscriber):
         threading.Thread.__init__(self)
@@ -84,5 +106,4 @@ class DaemonThread(threading.Thread):
 s = Subscriber()
 daemonthread = DaemonThread(s)
 daemonthread.start()
-
 s.start()
