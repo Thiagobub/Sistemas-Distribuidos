@@ -45,8 +45,7 @@ class Subscriber():
                 titulo = input('Informe o titulo da enquete: ')
                 local = input('Informe o loca do evento: ')
                 tempo = input('Informe data e horário do evento: ')
-                #limite = input('Informe data limite de votação (yyyy-mm-dd hh:mm): ')
-                limite = '2021-10-16 00:00'
+                limite = input('Informe data limite de votação (yyyy-mm-dd hh:mm): ')
                 print(self.server.setEnquete(self.name, titulo, local, tempo, limite))
             if n == '2':
                 titulo = input("Informe o titulo da enquete para votar: ")
@@ -61,13 +60,10 @@ class Subscriber():
                 print(self.server.consultaEnquete(self.name, self.signature.sign(h), titulo))
 
     @Pyro4.expose
-    def notify(self, msg, enquetes):
-        if 'Enquete' in msg:
-            print('\nNova enquete! Enquetes ativas:', enquetes)
-            #self.enquetes = enquetes # não sei pq, mas isso não funciona
-            # diz not receiving: not enough data se eu descomentar essa linha
-            # e o servidor parece q morre tmb, só da pra printar
-        elif 'Resultado' in msg:
+    def notify(self, msg):
+        if 'Enquete nova' in msg:
+            print(msg)
+        elif 'Enquete encerrada' in msg:
             print(msg)
 
 # Sem isso não tava dando pra passar a classe

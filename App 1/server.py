@@ -1,6 +1,7 @@
 from __future__ import print_function
 from base64 import b64decode,b64encode
 from datetime import datetime
+import copy
 import threading
 
 from Crypto.Hash import SHA384
@@ -16,7 +17,7 @@ class Enquete():
         self.titulo = titulo
         self.local = local
         self.tempo = tempo
-        self.limite = limite
+        self.limite = datetime.strptime(limite, '%Y-%m-%d %H:%M')
         self.votos = {}
         self.votantes = []
         self.status = 'Em andamento'
@@ -53,7 +54,7 @@ class Publisher():
         # Vai ter q usar algo com o flag ali em outro canto do código
         for name, info in self.users.items():
             enquetes = self.getEnquetes()
-            info[0].notify('Enquete nova', enquetes)
+            info[0].notify(f'\nEnquete nova! Enquetes ativas: {enquetes}')
         return 'Nova enquete publicada!'
 
     def findEnquete(self, titulo):
@@ -70,7 +71,7 @@ class Publisher():
         enquete = self.findEnquete(titulo)
         
         if enquete:
-            if name not in enquete.votantes:
+            if enquete.status == 'Em andamento':
                 if tempo in enquete.votos.keys():
                     enquete.votos[tempo] += 1
                 else:
@@ -117,7 +118,7 @@ class Publisher():
                     Status: {enquete.status}
                 """
             else:
-                print(f"{name} consultando enquete que não está cadastrado")
+                print(f"{name} consultando enquete que ele não está cadastrado")
                 return "Permissão negada!"
         else:
             print(f"{name} consultando enquete que não existe")
@@ -133,9 +134,22 @@ class Publisher():
         print("Thread iniciada...")
         while(1):
             if len(self.enquetes) > 0:
-                for enquete in self.enquetes:
-                    if len(enquete.votos) == len(self.users.keys()):
-                        print("{enquete.titulo} fechou os votos!")
+                lista = list(self.enquetes.keys())
+                for enquete in lista:
+                    if (((len(enquete.votantes) == len(self.users.keys())) or (datetime.now() >= enquete.limite)) and (enquete.status == 'Em andamento')):
+                        print(f"{enquete.titulo} encerrada!")
+                        enquete.status = 'Encerrada'
+                        msg = f"""\nEnquete encerrada!
+                    Titulo: {enquete.titulo}
+                    Local: {enquete.local}
+                    Quando: {enquete.tempo}
+                    Data final: {enquete.limite}
+                    Votos: {enquete.votos}
+                    Votantes: {enquete.votantes}
+                    Status: {enquete.status}
+                """
+                        for u in self.enquetes[enquete]:
+                            self.users[u][0].notify(msg)
 
 
 Pyro4.Daemon.serveSimple({ Publisher: "example.publisher" }, ns = True) # ???
