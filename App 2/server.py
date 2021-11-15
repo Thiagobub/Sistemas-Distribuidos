@@ -1,12 +1,10 @@
-######################################
-# Universidade Tecnológica Federal do Paraná
-# Sistemas Distribuídos
-# Alunos: Juliana Rodrigues e Thiago Bubniak
-# Engenharia de Computação
-# Aplicação 1 - Middleware com Pyro
-########################################
-
 from __future__ import print_function
+
+from flask import Flask, json
+from flask_restful import Resource, Api, reqparse
+import pandas as pd
+import ast
+
 from base64 import b64decode,b64encode
 from datetime import datetime
 import threading
@@ -15,8 +13,144 @@ from Crypto.Hash import SHA384
 from Crypto.Signature import pkcs1_15
 from Crypto.PublicKey import RSA
 
-from Pyro4.core import Daemon
-import Pyro4
+
+
+app = Flask(__name__)
+api = Api(app)
+
+users_path = 'users.json'                 # User -> [remote_ref, public key]
+enquetes_path = 'enquetes.json'              # Enquete -> [user1, user2, ...]
+
+
+class Publisher(Resource):
+    '''
+    Classe Publisher - responsável por armazenar as chaves públicas dos usuários e fazer o controle das 
+    enquetes, assim como seus status
+    '''
+    def __init__(self):
+        self.flag_enquete = False
+
+        # inicializa o publisher com uma thread, tendo a função start como trigger
+        #self.check()
+    
+    def get(self):
+        """
+            Pega informações da enquete que o usuário quer - Pronto!
+        """
+        parser = reqparse.RequestParser()
+
+        parser.add_argument('user', required=True)
+        parser.add_argument('enquete', required=True)
+
+        args = parser.parse_args()
+
+        with open(enquetes_path, 'r+') as f:
+            data = json.load(f)
+            f.close()
+        
+        if args['enquete'] in data.keys():
+            if args['user'] in data[args['enquete']]['votantes']:
+                return {'request': data[args['enquete']]}, 200
+            else:
+                return 401
+        else:
+            return 404
+
+    def post(self):
+        """
+            Posta uma nova enquete - Pronto!
+        """
+        parser = reqparse.RequestParser()  # initialize
+
+        parser.add_argument('user', required=True)  # add arguments
+        parser.add_argument('enquete', required=True)
+        parser.add_argument('local', required=True)
+        parser.add_argument('limite', required=True)
+        parser.add_argument('votos', required=True)
+
+        args = parser.parse_args()  # parse arguments to dictionary
+
+        with open(enquetes_path, 'r+') as f:
+            data = json.load(f)
+            f.close()
+
+        votos = {}
+        for t in ast.literal_eval(args['votos']):
+            votos[t] = 0
+
+        enquete = { 'local': args['local'],
+                    'limite': args['limite'],
+                    'votos': votos,
+                    'votantes': [args['user']],
+                    'status': 'Em andamento'}
+
+        data[args['enquete']] = enquete
+
+        with open(enquetes_path, 'w') as f:
+            json.dump(data, f, ensure_ascii=False, indent=4)
+            f.close()
+
+        return 200
+
+    def put(self):
+        """
+            Coloca voto em enquete - Pronto!
+        """
+        parser = reqparse.RequestParser()
+
+        parser.add_argument('user', required=True)
+        parser.add_argument('enquete', required=True)
+        parser.add_argument('voto', required=True)
+
+        args = parser.parse_args()
+
+        with open(enquetes_path, 'r+') as f:
+            data = json.load(f)
+            f.close()
+        
+        if args['enquete'] in data.keys():
+            if data[args['enquete']]['status'] == 'Em andamento':
+                if args['voto'] in data[args['enquete']]['votos'].keys():
+                    data[args['enquete']]['votos'][args['voto']] += 1
+
+                    if args['user'] not in data[args['enquete']]['votantes']:
+                        data[args['enquete']]['votantes'].append(args['user'])
+                else:
+                    return 404
+            else:
+                return 401
+        else:
+            return 404
+
+        with open(enquetes_path, 'w') as f:
+            json.dump(data, f, ensure_ascii=False, indent=4)
+            f.close()
+
+        return 200
+
+        pass
+
+
+api.add_resource(Publisher, '/users')
+
+if __name__ == '__main__':
+    data = {}
+    with open(users_path, 'w') as f:
+        json.dump(data, f)
+    with open(enquetes_path, 'w') as f:
+        json.dump(data, f)
+    app.run()
+
+
+
+
+
+
+
+
+
+
+
 
 class Enquete():
     '''
@@ -34,8 +168,7 @@ class Enquete():
         self.votantes = []
         self.status = 'Em andamento'
 
-@Pyro4.behavior(instance_mode='single')
-@Pyro4.expose   # é permitido acessar a classe remotamente
+
 class Publisher():
     '''
     Classe Publisher - responsável por armazenar as chaves públicas dos usuários e fazer o controle das 
@@ -196,7 +329,7 @@ class Publisher():
                             self.users[u][0].notify(msg)
 
 # inicializa o server
-Pyro4.Daemon.serveSimple({ Publisher: "example.publisher" }, ns = True)
+#Pyro4.Daemon.serveSimple({ Publisher: "example.publisher" }, ns = True)
 # inicia o naming server
-ns = Pyro4.locateNS()
-uri = Daemon.register()
+#ns = Pyro4.locateNS()
+#uri = Daemon.register()
