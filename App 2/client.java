@@ -27,10 +27,10 @@ public class client {
         System.out.print("Informe seu nome: ");  
         name = sc.nextLine();              //reads string
 
-        // GET
+        // GET - visit
         Map<Object, Object> data = new HashMap<>();
         data.put("user", name);
-        data.put("enquete", "Bonde de Floripa");
+        data.put("request", "visit");
 
         httpclient = HttpClient.newHttpClient();
         httprequest = HttpRequest.newBuilder()
@@ -44,52 +44,6 @@ public class client {
             .join();
 
         System.out.println(response);
-
-        // PUT
-        /*
-        Map<Object, Object> data = new HashMap<>();
-        data.put("user", name);
-        data.put("enquete", "Bonde de Floripa");
-        data.put("voto", "2021-11-19");
-
-        httpclient = HttpClient.newHttpClient();
-        httprequest = HttpRequest.newBuilder()
-            .PUT(HttpRequest.BodyPublishers.ofString(buildFormDataFromMap(data)))
-            .uri(URI.create(uri))
-            .header("Content-Type", "application/x-www-form-urlencoded")
-            .build();
-        System.out.println(httprequest);
-        Void response = httpclient.sendAsync(httprequest, BodyHandlers.ofString())
-            .thenApply(HttpResponse::body)
-            .thenAccept(System.out::println)
-            .join();
-
-        System.out.println(response);   */
-
-
-        // POST
-        /*
-        Map<Object, Object> data = new HashMap<>();
-        data.put("user", name);
-        data.put("enquete", "Nova enquete");
-        data.put("local", "Nova York");
-        data.put("limite", "2021-12-24");
-        data.put("votos", "['2021-11-19','2021-11-20','2021-11-21']");
-
-        httpclient = HttpClient.newHttpClient();
-        httprequest = HttpRequest.newBuilder()
-            .POST(HttpRequest.BodyPublishers.ofString(buildFormDataFromMap(data)))
-            .uri(URI.create(uri))
-            .header("Content-Type", "application/x-www-form-urlencoded")
-            .build();
-        System.out.println(httprequest);
-        Void response = httpclient.sendAsync(httprequest, BodyHandlers.ofString())
-            .thenApply(HttpResponse::body)
-            .thenAccept(System.out::println)
-            .join();
-
-        System.out.println(response);   */
-
         return;
     }
 
@@ -98,7 +52,7 @@ public class client {
     }
 
     //private static HttpRequest.BodyPublisher buildFormDataFromMap(Map<Object, Object> data) {
-        private static String buildFormDataFromMap(Map<Object, Object> data) {
+    private static String buildFormDataFromMap(Map<Object, Object> data) {
         var builder = new StringBuilder();
         for (Map.Entry<Object, Object> entry : data.entrySet()) {
             if (builder.length() > 0) {
@@ -135,7 +89,29 @@ public class client {
                 String limite = sc.nextLine();
 
                 System.out.println(name + titulo + local + tempo + limite);
+
                 // Enviar infos pro servidor
+                Map<Object, Object> data = new HashMap<>();
+                data.put("user", name);
+                data.put("enquete", "Nova enquete");
+                data.put("local", "Nova York");
+                data.put("limite", "2021-12-24");
+                data.put("votos", "['2021-11-19','2021-11-20','2021-11-21']");
+        
+                httpclient = HttpClient.newHttpClient();
+                httprequest = HttpRequest.newBuilder()
+                    .POST(HttpRequest.BodyPublishers.ofString(buildFormDataFromMap(data)))
+                    .uri(URI.create(uri))
+                    .header("Content-Type", "application/x-www-form-urlencoded")
+                    .build();
+                System.out.println(httprequest);
+                Void response = httpclient.sendAsync(httprequest, BodyHandlers.ofString())
+                    .thenApply(HttpResponse::body)
+                    .thenAccept(System.out::println)
+                    .join();
+        
+                System.out.println(response);
+                
 
             } else if (n == 2) {
                 System.out.println("Informe o titulo da enquete: ");
@@ -144,15 +120,51 @@ public class client {
                 String tempo = sc.nextLine();
 
                 System.out.println(name + titulo + tempo);
+
                 // Enviar infos pro servidor
+                Map<Object, Object> data = new HashMap<>();
+                data.put("user", name);
+                data.put("enquete", "Bonde de Floripa");
+                data.put("voto", "2021-11-19");
+        
+                httpclient = HttpClient.newHttpClient();
+                httprequest = HttpRequest.newBuilder()
+                    .PUT(HttpRequest.BodyPublishers.ofString(buildFormDataFromMap(data)))
+                    .uri(URI.create(uri))
+                    .header("Content-Type", "application/x-www-form-urlencoded")
+                    .build();
+                System.out.println(httprequest);
+                Void response = httpclient.sendAsync(httprequest, BodyHandlers.ofString())
+                    .thenApply(HttpResponse::body)
+                    .thenAccept(System.out::println)
+                    .join();
+        
+                System.out.println(response);
 
             } else if (n == 3) {
                 System.out.println("Informe o titulo da enquete: ");
                 String titulo = sc.nextLine();
 
                 System.out.println(name + titulo);
-                // Enviar infos pro servidor
 
+                // Enviar infos pro servidor
+                Map<Object, Object> data = new HashMap<>();
+                data.put("user", name);
+                data.put("enquete", "Bonde de Floripa");
+                data.put("request", "get info");
+
+                httpclient = HttpClient.newHttpClient();
+                httprequest = HttpRequest.newBuilder()
+                    .GET()
+                    .uri(URI.create(uri + "?" + buildFormDataFromMap(data)))
+                    .build();
+                System.out.println(uri + "?" + buildFormDataFromMap(data));
+                Void response = httpclient.sendAsync(httprequest, BodyHandlers.ofString())
+                    .thenApply(HttpResponse::body)
+                    .thenAccept(System.out::println)
+                    .join();
+
+                System.out.println(response);
             }
         }
     }

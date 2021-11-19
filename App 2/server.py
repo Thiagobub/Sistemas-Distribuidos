@@ -29,7 +29,7 @@ class Publisher(Resource):
     '''
     def __init__(self):
         self.flag_enquete = False
-
+        
         # inicializa o publisher com uma thread, tendo a função start como trigger
         #self.check()
     
@@ -40,21 +40,40 @@ class Publisher(Resource):
         parser = reqparse.RequestParser()
 
         parser.add_argument('user', required=True)
-        parser.add_argument('enquete', required=True)
+        parser.add_argument('request', required=True)
+        parser.add_argument('enquete', required=False)
 
         args = parser.parse_args()
 
-        with open(enquetes_path, 'r+') as f:
-            data = json.load(f)
-            f.close()
-        
-        if args['enquete'] in data.keys():
-            if args['user'] in data[args['enquete']]['votantes']:
-                return {'request': data[args['enquete']]}, 200
+        if args['request'] == 'visit':
+            with open(users_path, 'r+') as f:
+                data = json.load(f)
+                f.close()
+
+            if args['user'] not in data:
+                data[args['user']] = '' # salvar referencia do cliente? SSE
+                with open(users_path, 'w') as f:
+                    json.dump(data, f, ensure_ascii=False, indent=4)
+                    f.close()
+                return 200
             else:
                 return 401
+
+        elif args['request'] == 'get info':
+            with open(enquetes_path, 'r+') as f:
+                data = json.load(f)
+                f.close()
+            
+            if args['enquete'] in data.keys() and args['enquete']:
+                if args['user'] in data[args['enquete']]['votantes']:
+                    return {'request': data[args['enquete']]}, 200
+                else:
+                    return 401
+            else:
+                return 404
+
         else:
-            return 404
+            return 406
 
     def post(self):
         """
