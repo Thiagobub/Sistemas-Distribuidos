@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 from flask import Flask, json
+from flask_sse import sse
 from flask_restful import Resource, Api, reqparse
 import pandas as pd
 import ast
@@ -16,6 +17,8 @@ from Crypto.PublicKey import RSA
 
 
 app = Flask(__name__)
+app.config["REDIS_URL"] = "redis://localhost"
+app.register_blueprint(sse, url_prefix='/stream')
 api = Api(app)
 
 users_path = 'users.json'                 # User -> [remote_ref, public key]
@@ -108,6 +111,8 @@ class Publisher(Resource):
         with open(enquetes_path, 'w') as f:
             json.dump(data, f, ensure_ascii=False, indent=4)
             f.close()
+
+        sse.publish({"message": str(data.keys())}, type='publish')
 
         return 200
 

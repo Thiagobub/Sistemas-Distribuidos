@@ -27,6 +27,17 @@ public class client {
         System.out.print("Informe seu nome: ");  
         name = sc.nextLine();              //reads string
 
+        // EventHandler eventHandler = { events.add(eventText); };
+        // SSEClient sseClient = SSEClient.builder().url(url).eventHandler(eventHandler)
+        //     .build();
+        // sseClient.start();
+
+
+        // EventHandler eventHandler = eventText -> { events.add(eventText); };
+        // SSEClient sseClient = SSEClient.builder().url(url).eventHandler(eventHandler)
+        //     .build();
+        // sseClient.start();
+
         // GET - visit
         Map<Object, Object> data = new HashMap<>();
         data.put("user", name);
@@ -50,6 +61,15 @@ public class client {
     private void send_info(){
         /// jogar a parte de cima aqui dentro pra não ficar tão repetido
     }
+
+    // public interface EventHandler {
+
+    //     /**
+    //      * Handle the event text.
+    //      * @param eventText - trimmed event text
+    //      */
+    //     public void handle(String eventText);
+    // }
 
     //private static HttpRequest.BodyPublisher buildFormDataFromMap(Map<Object, Object> data) {
     private static String buildFormDataFromMap(Map<Object, Object> data) {
