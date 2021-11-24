@@ -61,28 +61,30 @@ class Publisher(Resource):
                 with open(users_path, 'w') as f:
                     json.dump(data, f, ensure_ascii=False, indent=4)
                     f.close()
-                return 200, {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-    }
+                    print(200)
+                return 200
             else:
+                print(401)
                 return 401
 
-        elif args['request'] == 'get info':
+        elif args['request'] == 'get_info':
             with open(enquetes_path, 'r+') as f:
                 data = json.load(f)
                 f.close()
             
             if args['enquete'] in data.keys() and args['enquete']:
                 if args['user'] in data[args['enquete']]['votantes']:
-                    return {'request': data[args['enquete']]}, 200
+                    print(200)
+                    return json.dumps({'request': data[args['enquete']]})
                 else:
+                    print(401)
                     return 401
             else:
+                print(404)
                 return 404
 
         else:
+            print(406)
             return 406
 
     def post(self):
@@ -120,7 +122,7 @@ class Publisher(Resource):
             f.close()
 
         # notificando clientes sobre nova enquete
-        with open(users_path, 'r') as f:
+        with open(enquetes_path, 'r') as f:
             data = json.load(f)
             sse.publish({'message': f"enquetes ativass: {data.keys()}"}, type='publish')
             f.close()

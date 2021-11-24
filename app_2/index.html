@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Client</title>
+  </head>
+
+  <body>
+    <div id="visit">
+      <h1>Visit</h1>
+      <form>
+        <label for="username">Name</label>
+        <input type="text" id="username" /><br /><br />
+        <!-- <label for="username">Phone</label>
+        <input type="text" id="phone" /><br /><br /> -->
+        <input type="button" value="Visit" onclick="visit()" />
+      </form>
+    </div>
+
+    <div id="contentdiv">
+      <script src="client.js"></script>
+      <h3>Name:</h3>
+      <p id="loggedas"></p>
+      <!-- <h3>Phone:</h3>
+      <p id="loggedphone">Phone:</p> -->
+      <h1>Notifications</h1>
+      <div id="data"></div>
+
+      <h1>Consulta enquete</h1>
+      <form>
+        <label for="titulo_consulta">Titulo</label>
+        <input type="text" id="titulo_consulta" /><br /><br />
+        <input type="button" value="Consultar" onclick="consultaEnquetes()" />
+      </form>
+      <div id="response" display="block">
+        <p id="response"></p>
+      </div>
+
+      <br />
+      <h1>Cadastra enquete</h1>
+      <form>
+        <label for="titulo_cadastra">Titulo</label>
+        <input type="text" id="titulo_cadastra" /><br /><br />
+        <label for="local">Local</label>
+        <input type="text" id="local" /><br /><br />
+        <label for="limite">Limite</label>
+        <input type="text" id="limite" /><br /><br />
+        <label for="datas">Datas</label>
+        <input type="text" id="datas" /><br /><br />
+        <input type="button" value="Cadastrar" onclick="cadastraEnquete()" />
+      </form>
+      <div id="cadastra_result" display="block">
+        <p id="response_2"></p>
+      </div>
+      <br />
+
+      <h1>Vota enquete</h1>
+      <form>
+        <label for="titulo_vota">Enquete</label>
+        <input type="text" id="titulo_vota" /><br /><br />
+        <label for="voto">Voto</label>
+        <input type="text" id="voto" /><br /><br />
+        <input type="button" value="Votar" onclick="votaEnquete()" />
+      </form>
+    </div>
+  </body>
+</html>
