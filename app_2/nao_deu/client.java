@@ -1,3 +1,9 @@
+<<<<<<< HEAD:App 2/client.java
+=======
+
+
+import java.beans.EventHandler;
+>>>>>>> d38c9502766b44ba4a2d7665cc3203dd5f1c3c75:app_2/nao_deu/client.java
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
@@ -10,6 +16,12 @@ import java.util.Map;
 import java.util.Scanner;
 
 
+// import pacote.SSEClient.SubscribeStatus;
+// import com.sun.net.httpserver.HttpExchange;
+// import com.sun.net.httpserver.HttpHandler;
+// import com.sun.net.httpserver.HttpServer;
+
+
 public class client {
 
     String name;
@@ -19,18 +31,23 @@ public class client {
     HttpClient httpclient;
     HttpRequest httprequest;
 
-    String uri = "http://127.0.0.1:5000/users";
+    String uri = "http://10.0.0.109/users";
 
     public client() {
 
+<<<<<<< HEAD:App 2/client.java
         sc = new Scanner(System.in);                //System.in is a standard input stream  
         System.out.print("Informe seu nome: ");  
         name = sc.nextLine();                       //reads string
+=======
+
+>>>>>>> d38c9502766b44ba4a2d7665cc3203dd5f1c3c75:app_2/nao_deu/client.java
 
         // GET - visit
         Map<Object, Object> data = new HashMap<>();
         data.put("user", name);
         data.put("request", "visit");
+        // data.put("channel", "channel");
 
         httpclient = HttpClient.newHttpClient();
         httprequest = HttpRequest.newBuilder()
@@ -43,12 +60,47 @@ public class client {
             .thenAccept(System.out::println)
             .join();
 
+<<<<<<< HEAD:App 2/client.java
         //System.out.println(response);
         return;
     }
+=======
+        System.out.println(response);
+>>>>>>> d38c9502766b44ba4a2d7665cc3203dd5f1c3c75:app_2/nao_deu/client.java
 
-    private void send_info(){
-        /// jogar a parte de cima aqui dentro pra não ficar tão repetido
+
+
+        // POST - cadastra enquete
+        Map<Object, Object> data2 = new HashMap<>();
+        data2.put("user", name);
+        data2.put("enquete", "Nova enquete");
+        data2.put("local", "Nova York");
+        data2.put("limite", "2021-12-24");
+        data2.put("votos", "['2021-11-19','2021-11-20','2021-11-21']");
+
+        httpclient = HttpClient.newHttpClient();
+        httprequest = HttpRequest.newBuilder()
+            .POST(HttpRequest.BodyPublishers.ofString(buildFormDataFromMap(data2)))
+            .uri(URI.create(uri))
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .build();
+        System.out.println(httprequest);
+        Void response2 = httpclient.sendAsync(httprequest, BodyHandlers.ofString())
+            .thenApply(HttpResponse::body)
+            .thenAccept(System.out::println)
+            .join();
+
+        System.out.println(response2);
+
+
+
+        // SSE funcionando?
+        // String url = "http://10.0.0.109:5000/event";
+        // EventHandler eventHandler = eventText -> { events.add(eventText); };
+        // SSEClient sseClient = SSEClient.builder().url(url).eventHandler(eventHandler)
+        //     .build();
+        // sseClient.start();
+        // return;
     }
 
     // public interface EventHandler {
@@ -60,7 +112,7 @@ public class client {
     //     public void handle(String eventText);
     // }
 
-    //private static HttpRequest.BodyPublisher buildFormDataFromMap(Map<Object, Object> data) {
+
     private static String buildFormDataFromMap(Map<Object, Object> data) {
         var builder = new StringBuilder();
         for (Map.Entry<Object, Object> entry : data.entrySet()) {

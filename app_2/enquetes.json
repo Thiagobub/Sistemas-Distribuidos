@@ -1,0 +1,25 @@
+{
+    "1234": {
+        "limite": "1234",
+        "local": "1234",
+        "status": "Em andamento",
+        "votantes": [
+            "q"
+        ],
+        "votos": {
+            "2021-11-19": 0
+        }
+    },
+    "asdf": {
+        "limite": "asdf",
+        "local": "asdf",
+        "status": "Em andamento",
+        "votantes": [
+            "A",
+            "a"
+        ],
+        "votos": {
+            "2021-11-19": 1
+        }
+    }
+}
