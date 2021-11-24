@@ -11,7 +11,8 @@ header = {
 
 user = 'Thiago'
 
-response = requests.get('http://10.0.0.109:5000/users', params={'channel': channel, 'user': user, 'request': 'visit'}, headers=header, stream=True).json()
+response = requests.get('http://10.0.0.109:5000/users', params={'channel': channel, 'user': user, 'request': 'visit'},
+                    headers=header, stream=True).json()
 print(response)
 
 print(requests.post('http://10.0.0.109:5000/users', data={'user': user,

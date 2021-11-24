@@ -1,4 +1,3 @@
-
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
@@ -23,20 +22,10 @@ public class client {
     String uri = "http://127.0.0.1:5000/users";
 
     public client() {
-        sc = new Scanner(System.in); //System.in is a standard input stream  
+
+        sc = new Scanner(System.in);                //System.in is a standard input stream  
         System.out.print("Informe seu nome: ");  
-        name = sc.nextLine();              //reads string
-
-        // EventHandler eventHandler = { events.add(eventText); };
-        // SSEClient sseClient = SSEClient.builder().url(url).eventHandler(eventHandler)
-        //     .build();
-        // sseClient.start();
-
-
-        // EventHandler eventHandler = eventText -> { events.add(eventText); };
-        // SSEClient sseClient = SSEClient.builder().url(url).eventHandler(eventHandler)
-        //     .build();
-        // sseClient.start();
+        name = sc.nextLine();                       //reads string
 
         // GET - visit
         Map<Object, Object> data = new HashMap<>();
@@ -48,13 +37,13 @@ public class client {
             .GET()
             .uri(URI.create(uri + "?" + buildFormDataFromMap(data)))
             .build();
-        System.out.println(uri + "?" + buildFormDataFromMap(data));
+        //System.out.println(uri + "?" + buildFormDataFromMap(data));
         Void response = httpclient.sendAsync(httprequest, BodyHandlers.ofString())
             .thenApply(HttpResponse::body)
             .thenAccept(System.out::println)
             .join();
 
-        System.out.println(response);
+        //System.out.println(response);
         return;
     }
 
@@ -87,14 +76,14 @@ public class client {
     }
 
     public void start() {
-        System.out.println("Acessando o sistema.");
+        //System.out.println("Acessando o sistema.");
 
-        System.out.println(name);
+        //System.out.println(name);
         // FAZER VISITA AO SERVER ENVIANDO O TEU NOME
 
         while (true) {
             System.out.println("1 - Cadastrar enquete\n2 - Cadastrar voto em enquete\n3 - Consultar enquete\n");
-            System.out.println("Escolha uma das opções acima: ");
+            System.out.println("Escolha uma das opcoes acima: ");
             int n = sc.nextInt();
             sc.nextLine();
 
@@ -103,20 +92,20 @@ public class client {
                 String titulo = sc.nextLine();
                 System.out.println("Informe o local do evento: ");
                 String local = sc.nextLine();
-                System.out.println("Informe datas e horários possíveis do evento (yyyy-mm-dd_hh:mm, yyyy-mm-dd_hh:mm, ...): ");
+                System.out.println("Informe datas e horarios possiveis do evento (yyyy-mm-dd_hh:mm, yyyy-mm-dd_hh:mm, ...): ");
                 String tempo = sc.nextLine();
-                System.out.println("Informe data limite de votação (yyyy-mm-dd_hh:mm): ");
+                System.out.println("Informe data limite de votacao (yyyy-mm-dd_hh:mm): ");
                 String limite = sc.nextLine();
 
-                System.out.println(name + titulo + local + tempo + limite);
+                //System.out.println(name + titulo + local + tempo + limite);
 
                 // Enviar infos pro servidor
                 Map<Object, Object> data = new HashMap<>();
                 data.put("user", name);
-                data.put("enquete", "Nova enquete");
-                data.put("local", "Nova York");
-                data.put("limite", "2021-12-24");
-                data.put("votos", "['2021-11-19','2021-11-20','2021-11-21']");
+                data.put("enquete", titulo);
+                data.put("local", local);
+                data.put("limite", limite);
+                data.put("votos", tempo);
         
                 httpclient = HttpClient.newHttpClient();
                 httprequest = HttpRequest.newBuilder()
@@ -124,28 +113,33 @@ public class client {
                     .uri(URI.create(uri))
                     .header("Content-Type", "application/x-www-form-urlencoded")
                     .build();
-                System.out.println(httprequest);
+                //System.out.println(httprequest);
                 Void response = httpclient.sendAsync(httprequest, BodyHandlers.ofString())
                     .thenApply(HttpResponse::body)
                     .thenAccept(System.out::println)
                     .join();
         
-                System.out.println(response);
+                //System.out.println(response);
                 
 
             } else if (n == 2) {
-                System.out.println("Informe o titulo da enquete: ");
-                String titulo = sc.nextLine();
-                System.out.println("Informe data e horário que deseja participar (yyyy-mm-dd_hh:mm): ");
-                String tempo = sc.nextLine();
-
-                System.out.println(name + titulo + tempo);
-
-                // Enviar infos pro servidor
                 Map<Object, Object> data = new HashMap<>();
                 data.put("user", name);
-                data.put("enquete", "Bonde de Floripa");
-                data.put("voto", "2021-11-19");
+                
+                System.out.println("Informe o titulo da enquete: ");
+                String titulo = sc.nextLine();
+                data.put("enquete", titulo);
+                
+                System.out.println("Informe data e horario que deseja participar (yyyy-mm-dd_hh:mm): ");
+                String tempo = sc.nextLine();
+
+                //System.out.println(name + titulo + tempo);
+
+                // Enviar infos pro servidor
+                //Map<Object, Object> data = new HashMap<>();
+                //data.put("user", name);
+                data.put("enquete", titulo);
+                data.put("voto", tempo);
         
                 httpclient = HttpClient.newHttpClient();
                 httprequest = HttpRequest.newBuilder()
@@ -153,24 +147,24 @@ public class client {
                     .uri(URI.create(uri))
                     .header("Content-Type", "application/x-www-form-urlencoded")
                     .build();
-                System.out.println(httprequest);
+                //System.out.println(httprequest);
                 Void response = httpclient.sendAsync(httprequest, BodyHandlers.ofString())
                     .thenApply(HttpResponse::body)
                     .thenAccept(System.out::println)
                     .join();
         
-                System.out.println(response);
+                //System.out.println(response);
 
             } else if (n == 3) {
                 System.out.println("Informe o titulo da enquete: ");
                 String titulo = sc.nextLine();
 
-                System.out.println(name + titulo);
+                //System.out.println(name + titulo);
 
                 // Enviar infos pro servidor
                 Map<Object, Object> data = new HashMap<>();
                 data.put("user", name);
-                data.put("enquete", "Bonde de Floripa");
+                data.put("enquete", titulo);
                 data.put("request", "get info");
 
                 httpclient = HttpClient.newHttpClient();
@@ -178,13 +172,13 @@ public class client {
                     .GET()
                     .uri(URI.create(uri + "?" + buildFormDataFromMap(data)))
                     .build();
-                System.out.println(uri + "?" + buildFormDataFromMap(data));
+                //System.out.println(uri + "?" + buildFormDataFromMap(data));
                 Void response = httpclient.sendAsync(httprequest, BodyHandlers.ofString())
                     .thenApply(HttpResponse::body)
                     .thenAccept(System.out::println)
                     .join();
 
-                System.out.println(response);
+                //System.out.println(response);
             }
         }
     }
