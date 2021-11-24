@@ -15,7 +15,7 @@ function consultaEnquetes() {
     request: "get info"
   }
 
-  response = fetch("http://10.0.0.109:5000/users?channel=channel&user="+username + "&enquete="+titulo + "&request=get info", {
+  response = fetch("http://10.0.0.109:5000/users?user="+username + "&enquete="+titulo + "&request=get info", {
     method: "GET",
     headers: {}
   })
@@ -111,7 +111,7 @@ function visit() {
   var username = document.getElementById("username").value;
   document.getElementById("loggedas").innerHTML = username;
 
-  fetch("http://10.0.0.109:5000/users?channel=channel&user="+username + "&request=visit", {
+  fetch("http://10.0.0.109:5000/users?channel="+username +"&user="+username + "&request=visit", {
     method: "GET",
     headers: {},
   })

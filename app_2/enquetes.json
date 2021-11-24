@@ -1,20 +1,13 @@
 {
-    "1234": {
-        "limite": "2021-11-24_03:22",
-        "local": "1234",
-        "status": "Encerrada",
-        "votantes": [],
-        "votos": {
-            "2021-11-24": 0
-        }
-    },
     "asdf": {
-        "limite": "2021-11-24_03:21",
+        "limite": "2021-11-24_10:03",
         "local": "asdf",
-        "status": "Encerrada",
-        "votantes": [],
+        "status": "Em andamento",
+        "votantes": [
+            "Ju"
+        ],
         "votos": {
-            "2021-11-24": 0
+            "2021-11-24": 1
         }
     }
 }
