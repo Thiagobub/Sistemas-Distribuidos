@@ -231,8 +231,8 @@ class Publisher(Resource):
         #return Response(msg, mimeetype="text/event-stream")
         channel = 'channel'
         with app.app_context():
-            sse.publish(msg, type='publish')
-            print("Evento seila publicado às ",datetime.now())
+            sse.publish(msg, type='publish', channel=user)
+            print("Evento publish publicado às ",datetime.now())
 
     @app.route('/stream')
     def stream():
@@ -265,13 +265,7 @@ class Publisher(Resource):
                     # para cada enquete na lista, verifica se todos os usuários já votaram ou se o tempo da 
                     # enquete já encerrou
                     limiteDatetime = datetime.strptime(values['limite'], '%Y-%m-%d_%H:%M')
-                    if (((len(values['votantes']) == len(users.keys())) or (datetime.now() >= limiteDatetime))
-                         and (values['status'] == 'Em andamento')):
-                        print(f"{enquete_name} encerrada!")
-                        enquetes[enquete_name]['status'] = 'Encerrada'
-                        # atualiza json
-                        self.update_enquetes(enquetes)
-                        msg = f"""\nEnquete encerrada!
+                    msg = f"""\nEnquete encerrada!
                                     Titulo: {enquete_name}
                                     Local: {values['local']}
                                     Data final: {values['limite']}
@@ -279,8 +273,24 @@ class Publisher(Resource):
                                     Votantes: {values['votantes']}
                                     Status: {values['status']}
                                     """
-                        # notifica os usuários sobre o status das enquetes nas quais eles estão cadastrados
+                    # se a enquete acabar porque todos os usuários já votaram
+                    if (len(values['votantes']) == len(users.keys()) and (values['status'] == 'Em andamento')):
+                        print(f"{enquete_name} encerrada!")
+                        enquetes[enquete_name]['status'] = 'Encerrada'
+                        # atualiza json
+                        self.update_enquetes(enquetes)
+                        
+                        # notifica todos os usuários sobre o status das enquetes nas quais eles estão cadastrados
                         for u in users.keys():
+                            self.notify(user=u, msg={'message': msg})
+                    # se a enquete acabar por tempo
+                    elif ((values['status'] == 'Em andamento') or (datetime.now() >= limiteDatetime)):
+                        print(f"{enquete_name} encerrada!")
+                        enquetes[enquete_name]['status'] = 'Encerrada'
+                        # atualiza json
+                        self.update_enquetes(enquetes)
+                         # notifica somente os usuários que cadastraram voto na enquete
+                        for u in values['votantes'].keys():
                             self.notify(user=u, msg={'message': msg})
 
 
