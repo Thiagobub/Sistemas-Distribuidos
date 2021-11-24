@@ -1,13 +1,25 @@
 {
-    "asdf": {
-        "limite": "2021-11-24_10:03",
-        "local": "asdf",
-        "status": "Em andamento",
+    "1234": {
+        "limite": "2021-11-24_12:18",
+        "local": "1234",
+        "status": "Encerrada",
         "votantes": [
-            "Ju"
+            "Thiago"
         ],
         "votos": {
             "2021-11-24": 1
+        }
+    },
+    "asdf": {
+        "limite": "2021-11-24_12:18",
+        "local": "asdf",
+        "status": "Encerrada",
+        "votantes": [
+            "Thiago",
+            "Schinda"
+        ],
+        "votos": {
+            "2021-11-24": 2
         }
     }
 }

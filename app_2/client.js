@@ -122,29 +122,7 @@ function visit() {
       console.error(err);
     });
 
-  var targetContainer = document.getElementById("data");
-  var eventSource = new EventSource("http://10.0.0.109:5000/event");
-
-  eventSource.onmessage = function(e) {
-    targetContainer.innerHTML = e.data;
-  };
-
-  eventSource.onerror = (event, err) => {
-    console.error("Error in connect SSE", event, err);
-  };
-
-
-  // eventSource.addEventListener("message", (e) => {
-  //   console.log("received event", e);
-  //   var targetContainer = document.getElementById("data");
-  //   var data_filtered = e.data.replaceAll("---", "<br />");
-  //   //var data_filtered = "</pre>" + JSON.parse(e.data) + "</pre>"
-  //   targetContainer.innerHTML = data_filtered;
-  // });
-}
-
-
-var source = new EventSource("http://10.0.0.109:5000/event");
+    var source = new EventSource("http://10.0.0.109:5000/event?channel="+username);
     source.addEventListener('publish', function(event) {
         console.log(event.data);
         var data = JSON.parse(event.data);
@@ -158,5 +136,19 @@ var source = new EventSource("http://10.0.0.109:5000/event");
         console.log("Error"+ event)
         alert("Failed to connect to event stream. Is Redis running?");
     }, false);
+};
+
+
+  // eventSource.addEventListener("message", (e) => {
+  //   console.log("received event", e);
+  //   var targetContainer = document.getElementById("data");
+  //   var data_filtered = e.data.replaceAll("---", "<br />");
+  //   //var data_filtered = "</pre>" + JSON.parse(e.data) + "</pre>"
+  //   targetContainer.innerHTML = data_filtered;
+  // });
+
+
+
+
 
 // 2021-11-24_03:03

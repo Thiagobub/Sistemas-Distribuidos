@@ -35,6 +35,11 @@ api = Api(app)
 users_path = 'users.json'                 # User -> [remote_ref, public key]
 enquetes_path = 'enquetes.json'           # Enquete -> [user1, user2, ...]
 
+def get_message():
+    time.sleep(1.0)
+    s = time.ctime(time.time())
+    return s
+
 
 class Publisher(Resource):
     '''
@@ -74,6 +79,7 @@ class Publisher(Resource):
             f.close()
 
         return data
+
 
     def update_enquetes(self, data):
         '''
@@ -180,7 +186,11 @@ class Publisher(Resource):
         
         # notifica os clientes sobre nova enquete
         data = self.get_enquetes()
-        sse.publish({'message': f"enquetes ativas: {data.keys()}"}, type='publish')
+        with open(users_path, 'r') as f:
+            users = json.load(f)
+            for u in users.keys():
+                print(f'SSE: notificando {u} sobre novas enquetes.')
+                sse.publish({'message': f"enquetes ativas: {data.keys()}"}, type='publish', channel=u)
 
         return 200
 
@@ -226,7 +236,6 @@ class Publisher(Resource):
         print("Voto cadastrado!")
         return 200
 
-    #@app.route('/abroba')
     def notify(self, user, msg):
         #return Response(msg, mimeetype="text/event-stream")
         channel = 'channel'
@@ -234,13 +243,13 @@ class Publisher(Resource):
             sse.publish(msg, type='publish', channel=user)
             print("Evento publish publicado às ",datetime.now())
 
-    @app.route('/stream')
-    def stream():
-        def eventStream():
-            while True:
-                # wait for source data to be available, then push it
-                yield 'data: {}\n\n'.format(get_message())
-        return Response(eventStream(), mimetype="text/event-stream")
+    # @app.route('/stream/<username>')
+    # def stream(username):
+    #     def eventStream():
+    #         while True:
+    #             # wait for source data to be available, then push it
+    #             yield 'data: {}\n\n'.format(get_message())
+    #     return Response(eventStream(), mimetype="text/event-stream")
                           
     def check(self):
         threading.Thread(target=self._check).start()
@@ -284,13 +293,13 @@ class Publisher(Resource):
                         for u in users.keys():
                             self.notify(user=u, msg={'message': msg})
                     # se a enquete acabar por tempo
-                    elif ((values['status'] == 'Em andamento') or (datetime.now() >= limiteDatetime)):
+                    elif ((values['status'] == 'Em andamento') and (datetime.now() >= limiteDatetime)):
                         print(f"{enquete_name} encerrada!")
                         enquetes[enquete_name]['status'] = 'Encerrada'
                         # atualiza json
                         self.update_enquetes(enquetes)
                          # notifica somente os usuários que cadastraram voto na enquete
-                        for u in values['votantes'].keys():
+                        for u in values['votantes']:
                             self.notify(user=u, msg={'message': msg})
 
 
