@@ -15,7 +15,7 @@ function consultaEnquetes() {
     request: "get info"
   }
 
-  response = fetch("http://10.0.0.109:5000/users?channel=channel&user="+username + "&enquete="+titulo + "&request=get_info", {
+  response = fetch("http://10.0.0.109:5000/users?channel=channel&user="+username + "&enquete="+titulo + "&request=get info", {
     method: "GET",
     headers: {}
   })
@@ -122,19 +122,41 @@ function visit() {
       console.error(err);
     });
 
+  var targetContainer = document.getElementById("data");
   var eventSource = new EventSource("http://10.0.0.109:5000/event");
+
+  eventSource.onmessage = function(e) {
+    targetContainer.innerHTML = e.data;
+  };
 
   eventSource.onerror = (event, err) => {
     console.error("Error in connect SSE", event, err);
   };
 
-  eventSource.addEventListener("message", (e) => {
-    console.log("received event", e);
-    var targetContainer = document.getElementById("data");
-    var data_filtered = e.data.replaceAll("---", "<br />");
-    targetContainer.innerHTML = data_filtered;
-  });
+
+  // eventSource.addEventListener("message", (e) => {
+  //   console.log("received event", e);
+  //   var targetContainer = document.getElementById("data");
+  //   var data_filtered = e.data.replaceAll("---", "<br />");
+  //   //var data_filtered = "</pre>" + JSON.parse(e.data) + "</pre>"
+  //   targetContainer.innerHTML = data_filtered;
+  // });
 }
 
-//execute with -> "python -m http.server 8080"
-//see logs on "localhost:8080/public"
+
+var source = new EventSource("http://10.0.0.109:5000/event");
+    source.addEventListener('publish', function(event) {
+        console.log(event.data);
+        var data = JSON.parse(event.data);
+        console.log("The server says " + data.message);
+
+        var targetContainer = document.getElementById("data");
+        var data_filtered = event.data.replaceAll("---", "<br />");
+        targetContainer.innerHTML = data_filtered;
+    }, false);
+    source.addEventListener('error', function(event) {
+        console.log("Error"+ event)
+        alert("Failed to connect to event stream. Is Redis running?");
+    }, false);
+
+// 2021-11-24_03:03
