@@ -33,6 +33,7 @@ api = Api(app)
 users_path = 'users.json'                 # User -> [remote_ref, public key]
 enquetes_path = 'enquetes.json'           # Enquete -> [user1, user2, ...]
 
+lastEnqs = 0
 
 class Publisher(Resource):
     '''
@@ -82,7 +83,6 @@ class Publisher(Resource):
             json.dump(data, f, ensure_ascii=False, indent=4)
             f.close()
 
-
     def get(self):
         """
             Retorna as informações da enquete que o usuário solicitar no argumento 'enquete'
@@ -104,7 +104,6 @@ class Publisher(Resource):
             # caso o usuário não esteja cadastrado, então cadastra
             if args['user'] not in data:
                 data[args['user']] = args['channel']
-<<<<<<< HEAD:App 2/server.py
                 self.update_users(data)
                 # retorna mensagem de sucesso
                 return 200, {
@@ -121,56 +120,26 @@ class Publisher(Resource):
         elif args['request'] == 'get info':
             # abre o arquivo json de enquetes para carregar as enquetes cadastradas
             data = self.get_enquetes()
-=======
-                with open(users_path, 'w') as f:
-                    json.dump(data, f, ensure_ascii=False, indent=4)
-                    f.close()
-                    print(200)
-                return 200
-            else:
-                print(401)
-                return 401
-
-        elif args['request'] == 'get_info':
-            with open(enquetes_path, 'r+') as f:
-                data = json.load(f)
-                f.close()
->>>>>>> d38c9502766b44ba4a2d7665cc3203dd5f1c3c75:app_2/server.py
             
             # caso a enquete desejada esteja na lista
             if args['enquete'] in data.keys() and args['enquete']:
                 # caso o usuário esteja apto a votar naquela enquete
                 if args['user'] in data[args['enquete']]['votantes']:
-<<<<<<< HEAD:App 2/server.py
                     # retorna mensagem de sucesso
                     return {'request': data[args['enquete']]}, 200
                 # caso o usuário não possa votar naquela enquete
                 else:
                     # retorna mensagem de acesso negado à enquete
                     print("Usuario nao encontrado na lista de votantes da enquete")
-=======
-                    print(200)
-                    return json.dumps({'request': data[args['enquete']]})
-                else:
-                    print(401)
->>>>>>> d38c9502766b44ba4a2d7665cc3203dd5f1c3c75:app_2/server.py
                     return 401
             # caso a enquete não esteja na lista
             else:
-<<<<<<< HEAD:App 2/server.py
                 # retorna mensagem de enquete não encontrada
                 print("A enquete solicitada nao foi encontrada")
-=======
-                print(404)
->>>>>>> d38c9502766b44ba4a2d7665cc3203dd5f1c3c75:app_2/server.py
                 return 404
         # caso o usuário passe algo diferente de visit/get info, retorna msg de argumento inválido
         else:
-<<<<<<< HEAD:App 2/server.py
             print("Argumento do request invalido")
-=======
-            print(406)
->>>>>>> d38c9502766b44ba4a2d7665cc3203dd5f1c3c75:app_2/server.py
             return 406
 
     def post(self):
@@ -203,7 +172,6 @@ class Publisher(Resource):
                     'status': 'Em andamento'}
 
         data[args['enquete']] = enquete
-<<<<<<< HEAD:App 2/server.py
         
         # atualiza json com nova enquete
         self.update_enquetes(data)
@@ -211,18 +179,6 @@ class Publisher(Resource):
         # notifica os clientes sobre nova enquete
         data = self.get_users()
         sse.publish({'message': f"enquetes ativas: {data.keys()}"}, type='publish')
-=======
-
-        with open(enquetes_path, 'w') as f:
-            json.dump(data, f, ensure_ascii=False, indent=4)
-            f.close()
-
-        # notificando clientes sobre nova enquete
-        with open(enquetes_path, 'r') as f:
-            data = json.load(f)
-            sse.publish({'message': f"enquetes ativass: {data.keys()}"}, type='publish')
-            f.close()
->>>>>>> d38c9502766b44ba4a2d7665cc3203dd5f1c3c75:app_2/server.py
 
         return 200
 
@@ -280,11 +236,25 @@ class Publisher(Resource):
         '''
         Método principal do publisher, verifica os status das enquetes e notifica os usuários 
         '''
+        if len(lastEnqs) < len(self.get_enquetes()):
+            for enq in self.get_enquetes.keys():
+                if enq not in lastEnqs.keys():
+                    for u in self.get_users.keys():
+                        msg = f"""\nEnquete nova!
+                                    Titulo: {enq}
+                                    Local: {enq['local']}
+                                    Data final: {enq['limite']}
+                                    Votos: {enq['votos']}
+                                    Votantes: {enq['votantes']}
+                                    Status: {enq['status']}
+                                    """
+                        self.notify(user=u, msg=msg)
 
         # a todo momento, verifica se existem enquetes ativas e, para cada uma delas, verifica seu status
         while(1):
             # carrega enquetes
             enquetes = self.get_enquetes()
+            lastEnqs = enquetes
             time.sleep(1)
 
             # carrega users

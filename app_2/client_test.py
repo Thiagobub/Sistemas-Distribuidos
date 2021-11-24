@@ -5,14 +5,8 @@ import sseclient
 channel = 'channel'
 user = 'Thiago'
 
-<<<<<<< HEAD:App 2/client_test.py
-response = requests.get('http://10.0.0.109:5000/users', params={'channel': channel, 'user': user, 'request': 'visit'},
-                    headers=header, stream=True).json()
-print(response)
-=======
 print(requests.get('http://10.0.0.109:5000/users', params={'channel': channel, 'user': user, 'request': 'visit'}).json())
 
->>>>>>> d38c9502766b44ba4a2d7665cc3203dd5f1c3c75:app_2/client_test.py
 
 print(requests.post('http://10.0.0.109:5000/users', data={'user': user,
                                                          'enquete': 'Bonde de Floripa',
